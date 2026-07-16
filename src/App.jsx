@@ -21,26 +21,36 @@ function App() {
       <ScrollToTop />
       <Header />
 
-      <main>
+      <main id="main-content" tabIndex="-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
-          <Route path="/product/:slug" element={<ProductPage />} />
+          <Route
+            path="/product/:slug"
+            element={<ProductPage />}
+          />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route
+            path="/contact"
+            element={<ContactPage />}
+          />
           <Route path="/faq" element={<FAQPage />} />
+
           <Route
             path="/shipping"
             element={<PolicyPage type="shipping" />}
           />
+
           <Route
             path="/privacy"
             element={<PolicyPage type="privacy" />}
           />
+
           <Route
             path="/terms"
             element={<PolicyPage type="terms" />}
           />
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

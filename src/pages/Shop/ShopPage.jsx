@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
+import PageMeta from "../../components/PageMeta/PageMeta";
 import PageHero from "../../components/PageHero/PageHero";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import { useCart } from "../../context/CartContext.jsx";
@@ -10,10 +12,29 @@ import "./ShopPage.css";
 
 function ShopPage() {
   const { addItem } = useCart();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const categoryFromUrl = searchParams.get("category") || "All";
+
+  const initialCategory = productCategories.includes(categoryFromUrl)
+    ? categoryFromUrl
+    : "All";
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] =
+    useState(initialCategory);
   const [sortOrder, setSortOrder] = useState("featured");
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const nextCategory = searchParams.get("category") || "All";
+
+    setActiveCategory(
+      productCategories.includes(nextCategory)
+        ? nextCategory
+        : "All",
+    );
+  }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -47,22 +68,50 @@ function ShopPage() {
         return firstProduct.name.localeCompare(secondProduct.name);
       }
 
-      return Number(secondProduct.featured) - Number(firstProduct.featured);
+      return (
+        Number(secondProduct.featured) -
+        Number(firstProduct.featured)
+      );
     });
   }, [activeCategory, searchTerm, sortOrder]);
 
+  function selectCategory(category) {
+    setActiveCategory(category);
+
+    if (category === "All") {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category });
+    }
+  }
+
+  function clearFilters() {
+    setSearchTerm("");
+    setActiveCategory("All");
+    setSearchParams({});
+  }
+
   function handleQuickAdd(product) {
-  addItem(product, 1, product.colors?.[0] ?? "");
+    addItem(product, 1, product.colors?.[0] ?? "");
 
-  setMessage(`${product.name} was added to your cart.`);
+    setMessage(`${product.name} was added to your cart.`);
 
-  window.setTimeout(() => {
-    setMessage("");
-  }, 3000);
-}
+    window.setTimeout(() => {
+      setMessage("");
+    }, 3000);
+  }
 
   return (
     <>
+      <PageMeta
+        title={
+          activeCategory === "All"
+            ? "Shop All"
+            : `Shop ${activeCategory}`
+        }
+        description="Browse the Maple & Main collection of thoughtfully curated home, beauty, wellness, technology and lifestyle essentials."
+      />
+
       <PageHero
         eyebrow="Maple & Main Collection"
         title="Shop thoughtfully curated essentials"
@@ -78,7 +127,9 @@ function ShopPage() {
               type="search"
               value={searchTerm}
               placeholder="What are you looking for?"
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(event) =>
+                setSearchTerm(event.target.value)
+              }
             />
           </label>
 
@@ -87,23 +138,35 @@ function ShopPage() {
 
             <select
               value={sortOrder}
-              onChange={(event) => setSortOrder(event.target.value)}
+              onChange={(event) =>
+                setSortOrder(event.target.value)
+              }
             >
               <option value="featured">Featured</option>
-              <option value="price-low">Price: Low to high</option>
-              <option value="price-high">Price: High to low</option>
+              <option value="price-low">
+                Price: Low to high
+              </option>
+              <option value="price-high">
+                Price: High to low
+              </option>
               <option value="name">Product name</option>
             </select>
           </label>
         </div>
 
-        <div className="catalogCategories" aria-label="Product categories">
+        <div
+          className="catalogCategories"
+          aria-label="Product categories"
+        >
           {productCategories.map((category) => (
             <button
-              className={activeCategory === category ? "isActive" : ""}
+              className={
+                activeCategory === category ? "isActive" : ""
+              }
               type="button"
               key={category}
-              onClick={() => setActiveCategory(category)}
+              aria-pressed={activeCategory === category}
+              onClick={() => selectCategory(category)}
             >
               {category}
             </button>
@@ -111,19 +174,15 @@ function ShopPage() {
         </div>
 
         <div className="catalogResultsHeader">
-          <p>
+          <p aria-live="polite">
             <strong>{filteredProducts.length}</strong>{" "}
-            {filteredProducts.length === 1 ? "product" : "products"}
+            {filteredProducts.length === 1
+              ? "product"
+              : "products"}
           </p>
 
           {(searchTerm || activeCategory !== "All") && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm("");
-                setActiveCategory("All");
-              }}
-            >
+            <button type="button" onClick={clearFilters}>
               Clear filters
             </button>
           )}
@@ -142,7 +201,10 @@ function ShopPage() {
         ) : (
           <div className="catalogEmpty">
             <h2>No products found</h2>
-            <p>Try another search term or clear the selected category.</p>
+            <p>
+              Try another search term or clear the selected
+              category.
+            </p>
           </div>
         )}
 

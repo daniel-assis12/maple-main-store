@@ -300,6 +300,39 @@
     gap: 0;
     font-size: 11px;
   }
+  .skipLink {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  padding: 12px 16px;
+  background: #ffffff;
+  color: #263a35;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 160ms ease;
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
+.desktopNavigation a.isActive::after {
+  transform: scaleX(1);
+}
+
+.desktopNavigation a.isActive {
+  color: #3d554f;
+}
+
+.headerIconButton:focus-visible,
+.mobileMenuButton:focus-visible,
+.mobileMenuHeader button:focus-visible {
+  outline: 3px solid rgba(76, 103, 96, 0.45);
+  outline-offset: 3px;
+}
 
   .topbar span:not(:first-child) {
     display: none;

@@ -1,3 +1,4 @@
+import PageMeta from "../../components/PageMeta/PageMeta";
 import Hero from "../../components/Hero/Hero";
 import Benefits from "../../components/Benefits/Benefits";
 import Categories from "../../components/Categories/Categories";
@@ -10,6 +11,11 @@ import Newsletter from "../../components/Newsletter/Newsletter";
 function HomePage() {
   return (
     <>
+      <PageMeta
+        title="Everyday Essentials"
+        description="Discover thoughtfully curated home, beauty, wellness and lifestyle essentials selected to simplify everyday living."
+      />
+
       <Hero />
       <Benefits />
       <Categories />

@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import "./Header.css";
+import { Link, NavLink } from "react-router";
 import { useCart } from "../../context/CartContext.jsx";
+import "./Header.css";
 
 const navigationLinks = [
-  { label: "Shop", href: "#featured-products" },
-  { label: "Best Sellers", href: "#featured-products" },
-  { label: "New", href: "#categories" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#footer" },
+  { label: "Shop", href: "/shop" },
+  { label: "Best Sellers", href: "/shop" },
+  { label: "New", href: "/shop" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 function Header() {
-  const { itemCount, openCart } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { itemCount, openCart } = useCart();
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -28,6 +29,10 @@ function Header() {
 
   return (
     <>
+      <a className="skipLink" href="#main-content">
+        Skip to main content
+      </a>
+
       <div className="topbar">
         <span>Free Shipping on Qualifying U.S. Orders</span>
         <span>Secure Checkout</span>
@@ -35,37 +40,49 @@ function Header() {
       </div>
 
       <header className="siteHeader">
-        <a className="headerLogo" href="/" aria-label="Maple and Main home">
+        <Link
+          className="headerLogo"
+          to="/"
+          aria-label="Maple and Main home"
+        >
           Maple<span>&amp;Main</span>
-        </a>
+        </Link>
 
-        <nav className="desktopNavigation" aria-label="Main navigation">
+        <nav
+          className="desktopNavigation"
+          aria-label="Main navigation"
+        >
           {navigationLinks.map((link) => (
-            <a href={link.href} key={link.label}>
+            <NavLink
+              to={link.href}
+              key={link.label}
+              className={({ isActive }) =>
+                isActive ? "isActive" : ""
+              }
+            >
               {link.label}
-            </a>
+            </NavLink>
           ))}
         </nav>
 
         <div className="headerActions">
-          <button
+          <Link
             className="headerIconButton searchButton"
-            type="button"
-            aria-label="Search"
+            to="/shop"
+            aria-label="Search products"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="11" cy="11" r="7" />
               <path d="m16.5 16.5 4 4" />
             </svg>
-          </button>
+          </Link>
 
           <button
-              className="headerIconButton cartButton"
-               type="button"
-               aria-label="Open shopping cart"
-               onClick={openCart}
+            className="headerIconButton cartButton"
+            type="button"
+            aria-label={`Open shopping cart with ${itemCount} items`}
+            onClick={openCart}
           >
-        
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L20 8H7" />
               <circle cx="10" cy="20" r="1" />
@@ -76,11 +93,18 @@ function Header() {
           </button>
 
           <button
-            className={`mobileMenuButton ${isMenuOpen ? "isOpen" : ""}`}
+            className={`mobileMenuButton ${
+              isMenuOpen ? "isOpen" : ""
+            }`}
             type="button"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={
+              isMenuOpen ? "Close menu" : "Open menu"
+            }
             aria-expanded={isMenuOpen}
-            onClick={() => setIsMenuOpen((currentValue) => !currentValue)}
+            aria-controls="mobile-navigation"
+            onClick={() =>
+              setIsMenuOpen((currentValue) => !currentValue)
+            }
           >
             <span />
             <span />
@@ -90,29 +114,42 @@ function Header() {
       </header>
 
       <div
-        className={`mobileMenuOverlay ${isMenuOpen ? "isVisible" : ""}`}
+        className={`mobileMenuOverlay ${
+          isMenuOpen ? "isVisible" : ""
+        }`}
         onClick={closeMenu}
         aria-hidden="true"
       />
 
       <aside
-        className={`mobileMenu ${isMenuOpen ? "isOpen" : ""}`}
+        id="mobile-navigation"
+        className={`mobileMenu ${
+          isMenuOpen ? "isOpen" : ""
+        }`}
         aria-hidden={!isMenuOpen}
       >
         <div className="mobileMenuHeader">
           <span>Menu</span>
 
-          <button type="button" onClick={closeMenu} aria-label="Close menu">
+          <button
+            type="button"
+            onClick={closeMenu}
+            aria-label="Close menu"
+          >
             ×
           </button>
         </div>
 
         <nav aria-label="Mobile navigation">
           {navigationLinks.map((link) => (
-            <a href={link.href} key={link.label} onClick={closeMenu}>
+            <NavLink
+              to={link.href}
+              key={link.label}
+              onClick={closeMenu}
+            >
               <span>{link.label}</span>
               <span aria-hidden="true">→</span>
-            </a>
+            </NavLink>
           ))}
         </nav>
 
