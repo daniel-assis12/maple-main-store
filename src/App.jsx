@@ -14,6 +14,7 @@ import ContactPage from "./pages/Contact/ContactPage";
 import FAQPage from "./pages/FAQ/FAQPage";
 import PolicyPage from "./pages/Policy/PolicyPage";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
+import WixTestPage from "./pages/WixTest/WixTestPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <main id="main-content" tabIndex="-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/wix-test" element={<WixTestPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route
             path="/product/:slug"

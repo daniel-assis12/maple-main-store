@@ -247,4 +247,18 @@
   .quickAddButton {
     transition: none;
   }
+  .featuredProductsLoading {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  color: #6c6760;
+  font-size: 14px;
+}
+
+.catalogSourceNotice {
+  margin-top: 30px;
+  color: #8a3d36;
+  font-size: 12px;
+  text-align: center;
+}
 }

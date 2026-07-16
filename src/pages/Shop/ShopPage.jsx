@@ -1,43 +1,68 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+
 import PageMeta from "../../components/PageMeta/PageMeta";
 import PageHero from "../../components/PageHero/PageHero";
 import ProductCard from "../../components/ProductCard/ProductCard";
+
 import { useCart } from "../../context/CartContext.jsx";
-import {
-  productCategories,
-  products,
-} from "../../data/products.js";
+import { useCatalog } from "../../context/CatalogContext.jsx";
+
 import "./ShopPage.css";
 
 function ShopPage() {
   const { addItem } = useCart();
+
+  const {
+    products,
+    categories,
+    source,
+    isLoading,
+    error,
+  } = useCatalog();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const categoryFromUrl = searchParams.get("category") || "All";
+  const categoryFromUrl =
+    searchParams.get("category") || "All";
 
-  const initialCategory = productCategories.includes(categoryFromUrl)
+  const searchFromUrl =
+    searchParams.get("search") || "";
+
+  const initialCategory = categories.includes(categoryFromUrl)
     ? categoryFromUrl
     : "All";
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] =
+    useState(searchFromUrl);
+
   const [activeCategory, setActiveCategory] =
     useState(initialCategory);
-  const [sortOrder, setSortOrder] = useState("featured");
+
+  const [sortOrder, setSortOrder] =
+    useState("featured");
+
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const nextCategory = searchParams.get("category") || "All";
+    const nextCategory =
+      searchParams.get("category") || "All";
+
+    const nextSearch =
+      searchParams.get("search") || "";
 
     setActiveCategory(
-      productCategories.includes(nextCategory)
+      categories.includes(nextCategory)
         ? nextCategory
         : "All",
     );
-  }, [searchParams]);
+
+    setSearchTerm(nextSearch);
+  }, [categories, searchParams]);
 
   const filteredProducts = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const normalizedSearch =
+      searchTerm.trim().toLowerCase();
 
     const result = products.filter((product) => {
       const matchesCategory =
@@ -46,8 +71,12 @@ function ShopPage() {
 
       const matchesSearch =
         !normalizedSearch ||
-        product.name.toLowerCase().includes(normalizedSearch) ||
-        product.category.toLowerCase().includes(normalizedSearch) ||
+        product.name
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        product.category
+          .toLowerCase()
+          .includes(normalizedSearch) ||
         product.shortDescription
           .toLowerCase()
           .includes(normalizedSearch);
@@ -55,34 +84,65 @@ function ShopPage() {
       return matchesCategory && matchesSearch;
     });
 
-    return [...result].sort((firstProduct, secondProduct) => {
-      if (sortOrder === "price-low") {
-        return firstProduct.price - secondProduct.price;
-      }
+    return [...result].sort(
+      (firstProduct, secondProduct) => {
+        if (sortOrder === "price-low") {
+          return firstProduct.price - secondProduct.price;
+        }
 
-      if (sortOrder === "price-high") {
-        return secondProduct.price - firstProduct.price;
-      }
+        if (sortOrder === "price-high") {
+          return secondProduct.price - firstProduct.price;
+        }
 
-      if (sortOrder === "name") {
-        return firstProduct.name.localeCompare(secondProduct.name);
-      }
+        if (sortOrder === "name") {
+          return firstProduct.name.localeCompare(
+            secondProduct.name,
+          );
+        }
 
-      return (
-        Number(secondProduct.featured) -
-        Number(firstProduct.featured)
-      );
-    });
-  }, [activeCategory, searchTerm, sortOrder]);
+        return (
+          Number(secondProduct.featured) -
+          Number(firstProduct.featured)
+        );
+      },
+    );
+  }, [
+    activeCategory,
+    products,
+    searchTerm,
+    sortOrder,
+  ]);
+
+  function updateUrlFilters(
+    nextCategory,
+    nextSearch = searchTerm,
+  ) {
+    const nextParameters = {};
+
+    if (nextCategory && nextCategory !== "All") {
+      nextParameters.category = nextCategory;
+    }
+
+    if (nextSearch.trim()) {
+      nextParameters.search = nextSearch.trim();
+    }
+
+    setSearchParams(nextParameters);
+  }
 
   function selectCategory(category) {
     setActiveCategory(category);
+    updateUrlFilters(category);
+  }
 
-    if (category === "All") {
-      setSearchParams({});
-    } else {
-      setSearchParams({ category });
-    }
+  function handleSearchChange(event) {
+    const nextSearch = event.target.value;
+
+    setSearchTerm(nextSearch);
+  }
+
+  function handleSearchBlur() {
+    updateUrlFilters(activeCategory, searchTerm);
   }
 
   function clearFilters() {
@@ -92,7 +152,11 @@ function ShopPage() {
   }
 
   function handleQuickAdd(product) {
-    addItem(product, 1, product.colors?.[0] ?? "");
+    addItem(
+      product,
+      1,
+      product.colors?.[0] ?? "Standard",
+    );
 
     setMessage(`${product.name} was added to your cart.`);
 
@@ -109,7 +173,7 @@ function ShopPage() {
             ? "Shop All"
             : `Shop ${activeCategory}`
         }
-        description="Browse the Maple & Main collection of thoughtfully curated home, beauty, wellness, technology and lifestyle essentials."
+        description="Browse the Maple & Main collection of thoughtfully curated everyday essentials."
       />
 
       <PageHero
@@ -119,6 +183,12 @@ function ShopPage() {
       />
 
       <section className="shopCatalog">
+        {error && source === "local" && (
+          <div className="catalogConnectionNotice">
+            {error}
+          </div>
+        )}
+
         <div className="catalogToolbar">
           <label className="catalogSearch">
             <span>Search products</span>
@@ -127,9 +197,16 @@ function ShopPage() {
               type="search"
               value={searchTerm}
               placeholder="What are you looking for?"
-              onChange={(event) =>
-                setSearchTerm(event.target.value)
-              }
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  updateUrlFilters(
+                    activeCategory,
+                    searchTerm,
+                  );
+                }
+              }}
             />
           </label>
 
@@ -158,10 +235,12 @@ function ShopPage() {
           className="catalogCategories"
           aria-label="Product categories"
         >
-          {productCategories.map((category) => (
+          {categories.map((category) => (
             <button
               className={
-                activeCategory === category ? "isActive" : ""
+                activeCategory === category
+                  ? "isActive"
+                  : ""
               }
               type="button"
               key={category}
@@ -175,10 +254,16 @@ function ShopPage() {
 
         <div className="catalogResultsHeader">
           <p aria-live="polite">
-            <strong>{filteredProducts.length}</strong>{" "}
-            {filteredProducts.length === 1
-              ? "product"
-              : "products"}
+            {isLoading ? (
+              "Loading products..."
+            ) : (
+              <>
+                <strong>{filteredProducts.length}</strong>{" "}
+                {filteredProducts.length === 1
+                  ? "product"
+                  : "products"}
+              </>
+            )}
           </p>
 
           {(searchTerm || activeCategory !== "All") && (
@@ -188,7 +273,14 @@ function ShopPage() {
           )}
         </div>
 
-        {filteredProducts.length > 0 ? (
+        {isLoading ? (
+          <div className="catalogEmpty">
+            <h2>Loading the collection</h2>
+            <p>
+              We are retrieving the latest products from Maple & Main.
+            </p>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="catalogGrid">
             {filteredProducts.map((product) => (
               <ProductCard
@@ -202,8 +294,7 @@ function ShopPage() {
           <div className="catalogEmpty">
             <h2>No products found</h2>
             <p>
-              Try another search term or clear the selected
-              category.
+              Try another search term or clear the selected category.
             </p>
           </div>
         )}

@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@wix/ecom": "^1.0.2263",
+    "@wix/redirects": "^1.0.120",
+    "@wix/sdk": "^1.21.13",
+    "@wix/stores": "^1.0.828",
+    "js-cookie": "^3.0.8",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router": "^8.2.0",

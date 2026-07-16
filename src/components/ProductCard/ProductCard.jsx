@@ -2,6 +2,9 @@ import { Link } from "react-router";
 import "./ProductCard.css";
 
 function ProductCard({ product, onQuickAdd }) {
+  const displayedPrice =
+    product.formattedPrice || `$${product.price.toFixed(2)}`;
+
   return (
     <article className="catalogProductCard">
       <Link
@@ -9,15 +12,29 @@ function ProductCard({ product, onQuickAdd }) {
         to={`/product/${product.slug}`}
         aria-label={`View ${product.name}`}
       >
-        {product.badge && (
-          <span className="catalogProductBadge">{product.badge}</span>
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+          />
+        ) : (
+          <span className="catalogImageLabel">
+            Product image coming soon
+          </span>
         )}
 
-        <span className="catalogImageLabel">Product image coming soon</span>
+        {product.badge && (
+          <span className="catalogProductBadge">
+            {product.badge}
+          </span>
+        )}
       </Link>
 
       <div className="catalogProductInfo">
-        <p className="catalogProductCategory">{product.category}</p>
+        <p className="catalogProductCategory">
+          {product.category}
+        </p>
 
         <Link
           className="catalogProductName"
@@ -26,16 +43,19 @@ function ProductCard({ product, onQuickAdd }) {
           {product.name}
         </Link>
 
-        <div className="catalogProductRating">
-          <span aria-hidden="true">★★★★★</span>
+        {product.reviewCount > 0 ? (
+          <div className="catalogProductRating">
+            <span aria-hidden="true">★★★★★</span>
 
-          <small>
-            {product.rating.toFixed(1)}
-            {product.reviewCount > 0
-              ? ` (${product.reviewCount})`
-              : " • New product"}
-          </small>
-        </div>
+            <small>
+              {product.rating.toFixed(1)} ({product.reviewCount})
+            </small>
+          </div>
+        ) : (
+          <div className="catalogProductRating">
+            <small>New product</small>
+          </div>
+        )}
 
         <p className="catalogProductDescription">
           {product.shortDescription}
@@ -43,17 +63,22 @@ function ProductCard({ product, onQuickAdd }) {
 
         <div className="catalogProductBottom">
           <div className="catalogProductPrice">
-            <strong>${product.price.toFixed(2)}</strong>
+            <strong>{displayedPrice}</strong>
 
-            <span>${product.compareAtPrice.toFixed(2)}</span>
+            {product.compareAtPrice && (
+              <span>
+                ${product.compareAtPrice.toFixed(2)}
+              </span>
+            )}
           </div>
 
           <button
             type="button"
+            disabled={!product.inStock}
             onClick={() => onQuickAdd(product)}
             aria-label={`Add ${product.name} to cart`}
           >
-            Quick Add
+            {product.inStock ? "Quick Add" : "Out of Stock"}
           </button>
         </div>
       </div>

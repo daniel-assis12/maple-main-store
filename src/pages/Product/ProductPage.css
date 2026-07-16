@@ -406,4 +406,45 @@
   .relatedProductsHeader h2 {
     font-size: 40px;
   }
+  .productMainImage img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productThumbnails button {
+  overflow: hidden;
+  padding: 0;
+}
+
+.productThumbnails button.isSelected {
+  border-color: #4c6760;
+  box-shadow: 0 0 0 2px rgba(76, 103, 96, 0.16);
+}
+
+.productThumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productAddButton:disabled {
+  border-color: #c8c1b8;
+  background: #ddd7cf;
+  color: #756f68;
+  cursor: not-allowed;
+}
+
+.productDetailDescription p {
+  margin-bottom: 12px;
+}
+
+.productDetailDescription ul,
+.productDetailDescription ol {
+  margin: 14px 0;
+  padding-left: 22px;
+}
 }

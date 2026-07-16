@@ -1,20 +1,23 @@
 import { Link } from "react-router";
 import ProductCard from "../ProductCard/ProductCard";
 import { useCart } from "../../context/CartContext.jsx";
-import { products } from "../../data/products.js";
+import { useCatalog } from "../../context/CatalogContext.jsx";
 import "./FeaturedProducts.css";
 
 function FeaturedProducts() {
   const { addItem } = useCart();
+  const { products, isLoading, source } = useCatalog();
 
   const featuredProducts = products
     .filter((product) => product.featured)
     .slice(0, 4);
 
   function handleQuickAdd(product) {
-    const defaultColor = product.colors?.[0] ?? "";
-
-    addItem(product, 1, defaultColor);
+    addItem(
+      product,
+      1,
+      product.colors?.[0] ?? "Standard",
+    );
   }
 
   return (
@@ -40,15 +43,27 @@ function FeaturedProducts() {
         </Link>
       </div>
 
-      <div className="productsGrid">
-        {featuredProducts.map((product) => (
-          <ProductCard
-            product={product}
-            key={product.id}
-            onQuickAdd={handleQuickAdd}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="featuredProductsLoading">
+          Loading our collection...
+        </div>
+      ) : (
+        <div className="productsGrid">
+          {featuredProducts.map((product) => (
+            <ProductCard
+              product={product}
+              key={product.id}
+              onQuickAdd={handleQuickAdd}
+            />
+          ))}
+        </div>
+      )}
+
+      {source === "local" && !isLoading && (
+        <p className="catalogSourceNotice">
+          Demonstration products are temporarily being displayed.
+        </p>
+      )}
     </section>
   );
 }

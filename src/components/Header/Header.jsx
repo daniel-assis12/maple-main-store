@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router";
 import { useCart } from "../../context/CartContext.jsx";
+import { useCatalog } from "../../context/CatalogContext.jsx";
 import { useSearch } from "../../hooks/useSearch.js";
-import { products } from "../../data/products.js";
 import Search from "../Search/Search";
 import "./Header.css";
 
@@ -16,13 +16,13 @@ const navigationLinks = [
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const { itemCount, openCart } = useCart();
+  const { products } = useCatalog();
   const search = useSearch(products);
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen
-      ? "hidden"
-      : "";
+    document.body.style.overflow = isMenuOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";

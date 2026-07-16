@@ -169,4 +169,13 @@
     left: 20px;
     max-width: none;
   }
+  .catalogConnectionNotice {
+  margin-bottom: 30px;
+  padding: 16px 18px;
+  border-left: 3px solid #9b5b4b;
+  background: #f7ece8;
+  color: #793f35;
+  font-size: 13px;
+  line-height: 1.6;
+}
 }
