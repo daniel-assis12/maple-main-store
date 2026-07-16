@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router";
 import { useCart } from "../../context/CartContext.jsx";
+import { useSearch } from "../../hooks/useSearch.js";
+import { products } from "../../data/products.js";
+import Search from "../Search/Search";
 import "./Header.css";
 
 const navigationLinks = [
@@ -14,9 +17,12 @@ const navigationLinks = [
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { itemCount, openCart } = useCart();
+  const search = useSearch(products);
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
+    document.body.style.overflow = isMenuOpen
+      ? "hidden"
+      : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -25,6 +31,11 @@ function Header() {
 
   function closeMenu() {
     setIsMenuOpen(false);
+  }
+
+  function openProductSearch() {
+    closeMenu();
+    search.openSearch();
   }
 
   return (
@@ -66,16 +77,17 @@ function Header() {
         </nav>
 
         <div className="headerActions">
-          <Link
+          <button
             className="headerIconButton searchButton"
-            to="/shop"
+            type="button"
             aria-label="Search products"
+            onClick={openProductSearch}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="11" cy="11" r="7" />
               <path d="m16.5 16.5 4 4" />
             </svg>
-          </Link>
+          </button>
 
           <button
             className="headerIconButton cartButton"
@@ -140,6 +152,19 @@ function Header() {
           </button>
         </div>
 
+        <button
+          className="mobileSearchButton"
+          type="button"
+          onClick={openProductSearch}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m16.5 16.5 4 4" />
+          </svg>
+
+          Search products
+        </button>
+
         <nav aria-label="Mobile navigation">
           {navigationLinks.map((link) => (
             <NavLink
@@ -167,6 +192,8 @@ function Header() {
           <span>30-Day Guarantee</span>
         </div>
       </aside>
+
+      <Search {...search} />
     </>
   );
 }

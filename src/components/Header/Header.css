@@ -369,4 +369,33 @@
   .mobileMenu {
     transition: none;
   }
+.mobileSearchButton {
+  min-height: 52px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 0 16px;
+  border: 1px solid #d4cdc4;
+  background: #f7f4ef;
+  color: #334943;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mobileSearchButton svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+@media (max-width: 1050px) {
+  .mobileSearchButton {
+    display: flex;
+  }
 }
