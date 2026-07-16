@@ -1,0 +1,51 @@
+.pageHero {
+  padding: 110px 7%;
+  background: #f2ede5;
+  text-align: center;
+}
+
+.pageHeroInner {
+  width: min(800px, 100%);
+  margin: 0 auto;
+}
+
+.pageHeroInner > span {
+  display: block;
+  margin-bottom: 18px;
+  color: #4c6760;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+}
+
+.pageHeroInner h1 {
+  margin-bottom: 22px;
+  color: #252525;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(45px, 6vw, 76px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -2px;
+}
+
+.pageHeroInner p {
+  color: #69645e;
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+@media (max-width: 640px) {
+  .pageHero {
+    padding: 76px 20px;
+  }
+
+  .pageHeroInner h1 {
+    font-size: 45px;
+    letter-spacing: -1px;
+  }
+
+  .pageHeroInner p {
+    font-size: 16px;
+  }
+}

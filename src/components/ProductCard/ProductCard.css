@@ -1,0 +1,185 @@
+.catalogProductCard {
+  min-width: 0;
+  background: #ffffff;
+}
+
+.catalogProductImage {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: 20px;
+  color: #ffffff;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.catalogProductImage::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  transition: transform 350ms ease;
+}
+
+.catalogProductCard:hover .catalogProductImage::before {
+  transform: scale(1.035);
+}
+
+.productImageHome::before {
+  background: linear-gradient(135deg, #c9bba8, #81786d);
+}
+
+.productImageBeauty::before {
+  background: linear-gradient(135deg, #d9c4bd, #96786f);
+}
+
+.productImageTech::before {
+  background: linear-gradient(135deg, #82958f, #384944);
+}
+
+.productImageKitchen::before {
+  background: linear-gradient(135deg, #cfc6b5, #897e69);
+}
+
+.productImageTravel::before {
+  background: linear-gradient(135deg, #aa9d8e, #685f56);
+}
+
+.productImagePet::before {
+  background: linear-gradient(135deg, #96a79f, #566860);
+}
+
+.catalogProductBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #344b44;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.catalogImageLabel {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+
+.catalogProductInfo {
+  padding: 20px 2px 8px;
+}
+
+.catalogProductCategory {
+  margin-bottom: 8px;
+  color: #817b73;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.catalogProductName {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #252525;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.catalogProductName:hover {
+  color: #4c6760;
+}
+
+.catalogProductRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.catalogProductRating > span {
+  color: #b6915f;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.catalogProductRating small {
+  color: #817b73;
+  font-size: 11px;
+}
+
+.catalogProductDescription {
+  min-height: 48px;
+  margin-bottom: 18px;
+  color: #6e6962;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.catalogProductBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.catalogProductPrice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalogProductPrice strong {
+  color: #252525;
+  font-size: 15px;
+}
+
+.catalogProductPrice span {
+  color: #958f87;
+  font-size: 12px;
+  text-decoration: line-through;
+}
+
+.catalogProductBottom button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #4c6760;
+  background: transparent;
+  color: #334943;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.catalogProductBottom button:hover {
+  background: #4c6760;
+  color: #ffffff;
+}
+
+@media (max-width: 520px) {
+  .catalogProductName {
+    font-size: 24px;
+  }
+
+  .catalogProductBottom button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalogProductImage::before,
+  .catalogProductBottom button {
+    transition: none;
+  }
+}
