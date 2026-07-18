@@ -15,6 +15,7 @@ import FAQPage from "./pages/FAQ/FAQPage";
 import PolicyPage from "./pages/Policy/PolicyPage";
 import NotFoundPage from "./pages/NotFound/NotFoundPage";
 import WixTestPage from "./pages/WixTest/WixTestPage";
+import WixCartTestPage from "./pages/WixCartTest/WixCartTestPage";
 
 function App() {
   return (
@@ -30,7 +31,14 @@ function App() {
           <Route
             path="/product/:slug"
             element={<ProductPage />}
+            
           />
+          <Route path="/wix-test" element={<WixTestPage />} />
+
+<Route
+  path="/wix-cart-test"
+  element={<WixCartTestPage />}
+/>
           <Route path="/about" element={<AboutPage />} />
           <Route
             path="/contact"

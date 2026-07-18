@@ -1,5 +1,7 @@
 import { createClient, OAuthStrategy } from "@wix/sdk";
 import { products } from "@wix/stores";
+import { currentCart } from "@wix/ecom";
+import { redirects } from "@wix/redirects";
 
 const TOKEN_STORAGE_KEY = "maple-main-wix-tokens";
 
@@ -12,6 +14,8 @@ export const wixClient = isWixConfigured
   ? createClient({
       modules: {
         products,
+        currentCart,
+        redirects,
       },
       auth: OAuthStrategy({
         clientId,
@@ -40,8 +44,8 @@ function saveTokens(tokens) {
       JSON.stringify(tokens),
     );
   } catch {
-    // A conexão continua funcionando mesmo se o navegador
-    // bloquear o armazenamento local.
+    // A sessão continua funcionando mesmo quando
+    // o navegador bloqueia o armazenamento local.
   }
 }
 

@@ -21,7 +21,9 @@ export async function getWixProducts(limit = 100) {
   const result = await wixClient.products
     .queryProducts()
     .limit(limit)
-    .find();
+    .find({
+      includeVariants: true,
+    });
 
   return adaptWixProducts(result.items ?? []);
 }
@@ -54,7 +56,9 @@ export async function getWixProductById(productId) {
   await initializeWixVisitor();
 
   const result =
-    await wixClient.products.getProduct(productId);
+    await wixClient.products.getProduct(productId, {
+      includeVariants: true,
+    });
 
   const product = result?.product ?? result;
 
