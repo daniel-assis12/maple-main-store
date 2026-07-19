@@ -34,24 +34,59 @@ function getErrorStatus(error) {
   );
 }
 
-function buildSelectedOptions(product) {
-  const productOptions =
+function getProductOptions(product) {
+  return (
     product?.wixProduct?.productOptions ??
     product?.productOptions ??
-    [];
+    []
+  );
+}
+
+function buildSelectedOptions(
+  product,
+  selectedOption = "",
+) {
+  const productOptions =
+    getProductOptions(product);
 
   return productOptions.reduce(
-    (selectedOptions, option) => {
-      const firstChoice = option?.choices?.[0];
+    (selectedOptions, option, index) => {
+      const choices = option?.choices ?? [];
 
       const optionName =
         option?.name ??
-        option?.title;
+        option?.title ??
+        option?._id;
+
+      const requestedChoice =
+        index === 0 && selectedOption
+          ? choices.find((choice) => {
+              const choiceValues = [
+                choice?.description,
+                choice?.value,
+                choice?.title,
+                choice?._id,
+              ]
+                .filter(Boolean)
+                .map((value) =>
+                  String(value).toLowerCase(),
+                );
+
+              return choiceValues.includes(
+                String(
+                  selectedOption,
+                ).toLowerCase(),
+              );
+            })
+          : null;
+
+      const selectedChoice =
+        requestedChoice ?? choices[0];
 
       const choiceValue =
-        firstChoice?.description ??
-        firstChoice?.value ??
-        firstChoice?.title;
+        selectedChoice?.description ??
+        selectedChoice?.value ??
+        selectedChoice?.title;
 
       if (!optionName || !choiceValue) {
         return selectedOptions;
@@ -79,27 +114,35 @@ function findMatchingVariant(
     return null;
   }
 
-  const matchingVariant = variants.find((variant) => {
-    const variantChoices =
-      variant?.choices ?? {};
+  const matchingVariant = variants.find(
+    (variant) => {
+      const variantChoices =
+        variant?.choices ?? {};
 
-    return Object.entries(selectedOptions).every(
-      ([optionName, selectedValue]) =>
-        variantChoices[optionName] === selectedValue,
-    );
-  });
+      return Object.entries(
+        selectedOptions,
+      ).every(
+        ([optionName, selectedValue]) =>
+          variantChoices[optionName] ===
+          selectedValue,
+      );
+    },
+  );
 
   return matchingVariant ?? variants[0];
 }
 
-function buildCatalogReference(product) {
+function buildCatalogReference(
+  product,
+  selectedOption = "",
+) {
   const rawProduct =
     product?.wixProduct ?? product;
 
   const productId =
     rawProduct?._id ??
-    rawProduct?.id ??
     product?.wixId ??
+    rawProduct?.id ??
     product?.id;
 
   if (!productId) {
@@ -109,7 +152,10 @@ function buildCatalogReference(product) {
   }
 
   const selectedOptions =
-    buildSelectedOptions(product);
+    buildSelectedOptions(
+      product,
+      selectedOption,
+    );
 
   const catalogReference = {
     appId: WIX_STORES_APP_ID,
@@ -129,7 +175,7 @@ function buildCatalogReference(product) {
 
     if (!variantId) {
       throw new Error(
-        "This product uses managed variants, but no variant ID was loaded. Refresh the page and try again.",
+        "The selected product variant could not be identified.",
       );
     }
 
@@ -140,7 +186,9 @@ function buildCatalogReference(product) {
     return catalogReference;
   }
 
-  if (Object.keys(selectedOptions).length > 0) {
+  if (
+    Object.keys(selectedOptions).length > 0
+  ) {
     catalogReference.options = {
       options: selectedOptions,
     };
@@ -155,7 +203,8 @@ export async function getCurrentWixCart() {
 
   try {
     const response =
-      await wixClient.currentCart.getCurrentCart();
+      await wixClient.currentCart
+        .getCurrentCart();
 
     return extractCart(response);
   } catch (error) {
@@ -180,12 +229,16 @@ export async function getCurrentWixCart() {
 export async function addProductToWixCart(
   product,
   quantity = 1,
+  selectedOption = "",
 ) {
   ensureWixCartAvailable();
   await initializeWixVisitor();
 
   const catalogReference =
-    buildCatalogReference(product);
+    buildCatalogReference(
+      product,
+      selectedOption,
+    );
 
   const request = {
     lineItems: [
@@ -199,34 +252,9 @@ export async function addProductToWixCart(
     ],
   };
 
-  console.log(
-    "PRODUCT_VARIANT_STATUS:",
-    JSON.stringify(
-      {
-        manageVariants:
-          product?.wixProduct?.manageVariants,
-        variants:
-          product?.wixProduct?.variants,
-      },
-      null,
-      2,
-    ),
-  );
-
-  console.log(
-    "ADD_TO_CART_REQUEST_JSON:",
-    JSON.stringify(request, null, 2),
-  );
-
   const response =
-    await wixClient.currentCart.addToCurrentCart(
-      request,
-    );
-
-  console.log(
-    "ADD_TO_CART_RESPONSE_JSON:",
-    JSON.stringify(response, null, 2),
-  );
+    await wixClient.currentCart
+      .addToCurrentCart(request);
 
   const cart = extractCart(response);
 
@@ -235,7 +263,8 @@ export async function addProductToWixCart(
   }
 
   const refreshedResponse =
-    await wixClient.currentCart.getCurrentCart();
+    await wixClient.currentCart
+      .getCurrentCart();
 
   return extractCart(refreshedResponse);
 }
@@ -246,6 +275,12 @@ export async function updateWixCartQuantity(
 ) {
   ensureWixCartAvailable();
   await initializeWixVisitor();
+
+  if (!lineItemId) {
+    throw new Error(
+      "The Wix line item ID is missing.",
+    );
+  }
 
   const response =
     await wixClient.currentCart
@@ -268,6 +303,12 @@ export async function removeWixCartItem(
   ensureWixCartAvailable();
   await initializeWixVisitor();
 
+  if (!lineItemId) {
+    throw new Error(
+      "The Wix line item ID is missing.",
+    );
+  }
+
   const response =
     await wixClient.currentCart
       .removeLineItemsFromCurrentCart([
@@ -282,7 +323,8 @@ export async function clearWixCart() {
   await initializeWixVisitor();
 
   try {
-    await wixClient.currentCart.deleteCurrentCart();
+    await wixClient.currentCart
+      .deleteCurrentCart();
   } catch (error) {
     const status = getErrorStatus(error);
 
@@ -304,7 +346,8 @@ export async function startWixCheckout() {
   const checkoutResponse =
     await wixClient.currentCart
       .createCheckoutFromCurrentCart({
-        channelType: currentCart.ChannelType.WEB,
+        channelType:
+          currentCart.ChannelType.WEB,
       });
 
   const checkoutId =
@@ -318,17 +361,20 @@ export async function startWixCheckout() {
   }
 
   const redirectResponse =
-    await wixClient.redirects.createRedirectSession({
-      ecomCheckout: {
-        checkoutId,
-      },
-      callbacks: {
-        postFlowUrl: window.location.origin,
-      },
-    });
+    await wixClient.redirects
+      .createRedirectSession({
+        ecomCheckout: {
+          checkoutId,
+        },
+        callbacks: {
+          postFlowUrl:
+            window.location.origin,
+        },
+      });
 
   const checkoutUrl =
-    redirectResponse?.redirectSession?.fullUrl ??
+    redirectResponse?.redirectSession
+      ?.fullUrl ??
     redirectResponse?.fullUrl;
 
   if (!checkoutUrl) {
